@@ -168,38 +168,37 @@ class _HomeState extends State<Home> {
   }
 
   void _showFontSizePicker() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Font Size'),
-          content: SizedBox(
-            height: 70,
-            child: Column(
-              children: [
-                Text('Font Size: ${_fontSize.toStringAsFixed(1)}'),
-                Slider(
-                  value: _fontSize,
-                  min: 10.0,
-                  max: 100.0,
-                  divisions: 90,
-                  onChanged: (size) {
-                    setState(() {
-                      _fontSize = size;
-                    });
-                  },
-                ),
-              ],
-            ),
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Font Size: ${_fontSize.toStringAsFixed(1)}',
+                style: TextStyle(fontSize: 18),
+              ),
+              Slider(
+                value: _fontSize,
+                min: 10.0,
+                max: 100.0,
+                divisions: 90,
+                onChanged: (size) {
+                  setState(() {
+                    _fontSize = size;
+                  });
+                },
+              ),
+              ElevatedButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the bottom sheet
+                },
+              ),
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
         );
       },
     );
