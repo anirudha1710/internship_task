@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart'; // Import the color picker package
+
+import 'onbording.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,10 +12,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
   bool _isEditing = false; // Track if the text is being edited
-  String _displayText = 'Hello, Flutter!'; // Text to display on the image
-  String _selectedFont = 'Roboto'; // Default font
-  Color _selectedColor = Colors.black; // Default text color
-  double _fontSize = 24.0; // Default font size
   final TextEditingController _textController = TextEditingController();
 
   // List of available fonts
@@ -26,6 +23,8 @@ class _HomeState extends State<Home> {
     'Times New Roman',
     'Verdana',
   ];
+
+  List<DraggableText> _draggableTexts = []; // List to manage draggable text widgets
 
   void _onItemTapped(int index) {
     setState(() {
@@ -43,162 +42,52 @@ class _HomeState extends State<Home> {
     print('Forward button pressed');
   }
 
-  void _editText() {
+  void _addDraggableText() {
     setState(() {
-      _isEditing = true;
-      _textController.text = _displayText; // Set the current text for editing
+      // Create a draggable text widget with initial position
+      _draggableTexts.add(
+        DraggableText(
+          text: 'Draggable Text',
+          position: Offset(100, 100), // Default position, can be changed
+          onPositionChanged: (newPosition) {
+            setState(() {
+              // Update the position of the draggable text
+              _draggableTexts.firstWhere((element) => element.text == 'Draggable Text').position = newPosition;
+            });
+          },
+        ),
+      );
     });
   }
 
-  void _updateText() {
-    setState(() {
-      _displayText = _textController.text; // Update the display text
-      _isEditing = false;
-    });
-  }
-
-  void _showOptionsBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Edit Text'),
-                onTap: () {
-                  Navigator.of(context).pop(); // Close the bottom sheet
-                  _editText();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.font_download),
-                title: const Text('Font'),
-                onTap: () {
-                  Navigator.of(context).pop(); // Close the bottom sheet
-                  _showFontPicker();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.format_size),
-                title: const Text('Font Size'),
-                onTap: () {
-                  Navigator.of(context).pop(); // Close the bottom sheet
-                  _showFontSizePicker();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.color_lens),
-                title: const Text('Color'),
-                onTap: () {
-                  Navigator.of(context).pop(); // Close the bottom sheet
-                  _showColorPicker();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showFontPicker() {
+  void _editTextDialog(DraggableText draggableText) {
+    _textController.text = draggableText.text;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Select Font'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _fonts.map((font) {
-              return ListTile(
-                title: Text(
-                  'Sample Text',
-                  style: TextStyle(
-                    fontFamily: font,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  setState(() {
-                    _selectedFont = font;
-                  });
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showColorPicker() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Color'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: _selectedColor,
-              onColorChanged: (color) {
-                setState(() {
-                  _selectedColor = color;
-                });
-              },
-              showLabel: false,
-              pickerAreaHeightPercent: 0.8,
-            ),
+          title: Text('Edit Text'),
+          content: TextField(
+            controller: _textController,
+            decoration: InputDecoration(hintText: 'Enter new text'),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                setState(() {
+                  draggableText.text = _textController.text;
+                });
+                Navigator.of(context).pop();
               },
+              child: Text('OK'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  void _showFontSizePicker() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Font Size: ${_fontSize.toStringAsFixed(1)}',
-                style: TextStyle(fontSize: 18),
-              ),
-              Slider(
-                value: _fontSize,
-                min: 10.0,
-                max: 100.0,
-                divisions: 90,
-                onChanged: (size) {
-                  setState(() {
-                    _fontSize = size;
-                  });
-                },
-              ),
-              ElevatedButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the bottom sheet
-                },
-              ),
-            ],
-          ),
         );
       },
     );
@@ -227,53 +116,39 @@ class _HomeState extends State<Home> {
       ),
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('asset/bg.png'),
-                  fit: BoxFit.cover,
+          // Image widget or Onbording widget goes here
+          Onbording(),
+          ..._draggableTexts.map((draggableText) => Positioned(
+            left: draggableText.position.dx,
+            top: draggableText.position.dy,
+            child: Draggable(
+              feedback: Material(
+                child: Text(
+                  draggableText.text,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
                 ),
               ),
+              childWhenDragging: Container(), // Empty container while dragging
+              child: GestureDetector(
+                onTap: () {
+                  _editTextDialog(draggableText); // Show dialog to edit text
+                },
+                child: Text(
+                  draggableText.text,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              onDragEnd: (details) {
+                draggableText.onPositionChanged(details.offset);
+              },
             ),
-          ),
-          Center(
-            child: _isEditing
-                ? Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.8, // Limit width of TextField
-              ),
-              child: TextField(
-                controller: _textController,
-                autofocus: true,
-                onSubmitted: (_) => _updateText(), // Update text on submission
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Colors.transparent,
-                  filled: true,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                ),
-                style: TextStyle(
-                  fontSize: _fontSize, // Apply selected font size
-                  color: _selectedColor, // Apply selected color
-                  fontFamily: _selectedFont, // Apply selected font
-                ),
-              ),
-            )
-                : GestureDetector(
-              onTap: _showOptionsBottomSheet, // Show bottom sheet on tap
-              child: Text(
-                _displayText,
-                style: TextStyle(
-                  fontSize: _fontSize, // Apply selected font size
-                  color: _selectedColor, // Apply selected color
-                  backgroundColor: Colors.transparent,
-                  fontFamily: _selectedFont, // Apply selected font
-                ),
-              ),
-            ),
-          ),
+          )),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -293,10 +168,27 @@ class _HomeState extends State<Home> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
+        onTap: (index) {
+          _onItemTapped(index);
+          if (index == 0) {
+            _addDraggableText(); // Add draggable text when "Add Text" is clicked
+          }
+        },
       ),
     );
   }
+}
+
+class DraggableText {
+  String text;
+  Offset position;
+  final void Function(Offset) onPositionChanged;
+
+  DraggableText({
+    required this.text,
+    required this.position,
+    required this.onPositionChanged,
+  });
 }
 
 void main() {

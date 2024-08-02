@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   matrix_gesture_detector: ^0.2.0-nullsafety.1
   flutter_colorpicker: ^1.1.0
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +56,19 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  fonts:
+    - family: Dancing Script
+      fonts:
+        - asset: asset/Dancing_Script/DancingScript-VariableFont_wght.ttf
+    - family: Lobster Two
+      fonts:
+        - asset: asset/Lobster_Two/LobsterTwo-Italic.ttf
+    - family: Mochiy Pop One
+      fonts:
+        - asset: asset/Mochiy_Pop_One/MochiyPopOne-Regular.ttf
+    - family: Roboto
+      fonts:
+        - asset: asset/Roboto_Serif/static/RobotoSerif-Bold.ttf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
