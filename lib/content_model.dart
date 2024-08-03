@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 
 class UnbordingContent {
   String image;
-  List<String> texts; // Changed from String to List<String>
+  List<String> texts;
   double fontSize;
   String fontFamily;
   Color color;
+  double dx;
+  double dy;
 
   UnbordingContent({
     required this.image,
-    required this.texts, // Updated to List<String>
+    required this.texts,
     this.fontSize = 16.0,
     this.fontFamily = 'Roboto',
     this.color = Colors.black,
+    this.dx = 0.0,
+    this.dy = 0.0,
   });
 }
 
@@ -22,7 +26,7 @@ List<UnbordingContent> contents = [
     image: 'asset/bg.png',
   ),
   UnbordingContent(
-    texts: ['Please join us for a memorable evening filled with joy and celebration.'],
+    texts: ['Your next journey begins here!'],
     image: 'asset/bg.png',
   ),
   UnbordingContent(

@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'content_model.dart'; // Import your content model
 
-class Onbording extends StatefulWidget {
-  const Onbording({super.key});
+class Onboarding extends StatefulWidget {
+  const Onboarding({super.key});
 
   @override
-  State<Onbording> createState() => _OnbordingState();
+  State<Onboarding> createState() => _OnboardingState();
 }
 
-class _OnbordingState extends State<Onbording> {
+class _OnboardingState extends State<Onboarding> {
   int currentIndex = 0;
   int _selectedIndex = 0;
   bool _isEditing = false;
   final TextEditingController _textController = TextEditingController();
   late PageController _controller;
+  double _initTextSize = 16.0;
 
   final List<String> _fonts = [
-    'Roboto', 'Dancing Script', 'Lobster Two', 'Mochiy Pop One', // Add more fonts as needed
+    'Roboto', 'Dancing Script', 'Lobster Two',
+    'Mochiy Pop One', // Add more fonts as needed
   ];
 
   @override
@@ -138,7 +140,7 @@ class _OnbordingState extends State<Onbording> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text('Select Color', style: TextStyle(fontSize: 18)),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ColorPicker(
                 pickerColor: contents[_selectedIndex].color,
                 onColorChanged: (color) {
@@ -149,7 +151,7 @@ class _OnbordingState extends State<Onbording> {
                 showLabel: false,
                 pickerAreaHeightPercent: 0.6,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton(
                 child: const Text('OK'),
                 onPressed: () {
@@ -164,45 +166,56 @@ class _OnbordingState extends State<Onbording> {
   }
 
   void _showFontSizePicker() {
+    double sliderval = contents[_selectedIndex].fontSize;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Font Size: ${contents[_selectedIndex].fontSize.toStringAsFixed(1)}',
-                style: TextStyle(fontSize: 18),
+        return StatefulBuilder(
+          builder: (ctx, sets) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Font Size: ${contents[_selectedIndex].fontSize.toStringAsFixed(1)}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 10),
+                  Slider(
+                    value: sliderval,
+                    min: 10.0,
+                    max: 100.0,
+                    divisions: 90,
+                    onChanged: (size) {
+                      sets(() {
+                        sliderval = size;
+                        contents[_selectedIndex].fontSize = size;
+                        _initTextSize = size;
+                      });
+                      setState(() {
+                        contents[_selectedIndex].fontSize = size;
+                      });
+
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
               ),
-              SizedBox(height: 10),
-              Slider(
-                value: contents[_selectedIndex].fontSize,
-                min: 10.0,
-                max: 100.0,
-                divisions: 90,
-                onChanged: (size) {
-                  setState(() {
-                    contents[_selectedIndex].fontSize = size;
-                  });
-                },
-              ),
-              SizedBox(height: 10),
-              ElevatedButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
+            );
+          }
         );
       },
     );
   }
-
+  double? _textSize;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -220,7 +233,7 @@ class _OnbordingState extends State<Onbording> {
               return Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(38.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 38.0),
                     child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
@@ -230,52 +243,117 @@ class _OnbordingState extends State<Onbording> {
                       ),
                     ),
                   ),
-                  Center(
+                  Positioned(
+                    left: contents[i].dx,
+                    top: contents[i].dy,
                     child: _isEditing && _selectedIndex == i
                         ? Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.8,
-                      ),
-                      child: TextField(
-                        controller: _textController,
-                        autofocus: true,
-                        onSubmitted: (_) => _updateText(),
-                        decoration: InputDecoration(
-                          fillColor: Colors.transparent,
-                          filled: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 4.0),
-                        ),
-                        style: TextStyle(
-                          fontSize: contents[i].fontSize,
-                          color: contents[i].color,
-                          fontFamily: contents[i].fontFamily,
-                        ),
-                      ),
-                    )
-                        : GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex = i;
-                        });
-                        _showOptionsBottomSheet();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(55.0),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            contents[i].texts.join('\n'), // Join texts for display
-                            style: TextStyle(
-                              fontSize: contents[i].fontSize,
-                              color: contents[i].color,
-                              fontFamily: contents[i].fontFamily,
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.8,
                             ),
-                            textAlign: TextAlign.center,
+                            child: TextField(
+                              maxLines: null,
+                              onTapOutside: (event) {
+                                print('onTapOutside');
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                _updateText();
+                              },
+                              controller: _textController,
+                              autofocus: false,
+                              onSubmitted: (_) => _updateText(),
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.zero,
+                                fillColor: Colors.transparent,
+                                filled: true,
+                              ),
+                              style: TextStyle(
+                                fontSize: contents[i].fontSize,
+                                color: contents[i].color,
+                                fontFamily: contents[i].fontFamily,
+                              ),
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedIndex = i;
+                              });
+                              _showOptionsBottomSheet();
+                            },
+                      onScaleUpdate: (details) {
+                        setState(() {
+                          _textSize =
+                              _initTextSize + (_initTextSize * (details.scale * .35));
+                          contents[i].fontSize = _textSize!;
+                        });
+                      },
+                      onScaleEnd: (ScaleEndDetails details) {
+                        setState(() {
+                          contents[i].fontSize = _textSize!;
+                        });
+                      },
+                            child: Draggable(
+                              feedback: Material(
+                                color: Colors.transparent,
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+
+                                  width: MediaQuery.of(context).size.width -
+                                      38 * 2,
+                                  child: Text(
+                                    contents[i].texts.join('\n'),
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontSize: contents[i].fontSize,
+                                      color: contents[i].color,
+
+                                      fontFamily: contents[i].fontFamily,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                              childWhenDragging: Container(),
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+
+                                ),
+                                width:
+                                    MediaQuery.of(context).size.width - 38 * 2,
+                                child: Text(
+                                  contents[i].texts.join('\n'),
+                                  softWrap: true,
+                                  style: TextStyle(
+                                    fontSize: contents[i].fontSize,
+                                    color: contents[i].color,
+                                    fontFamily: contents[i].fontFamily,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              onDragEnd: (details) {
+                                setState(() {
+                                  contents[i].dx = details.offset.dx;
+                                  contents[i].dy = details.offset.dy - 80;
+                                  if (contents[i].dx < 38) {
+                                    contents[i].dx = 38;
+                                  }
+                                  if (contents[i].dx >
+                                      MediaQuery.of(context).size.width - 38) {
+                                    contents[i].dx =
+                                        MediaQuery.of(context).size.width - 38;
+                                  }
+                                });
+                              },
+                              onDragUpdate: (details) {
+                                setState(() {
+                                  contents[i].dx = details.delta.dx;
+                                  contents[i].dy = details.delta.dy;
+                                });
+                              },
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               );
@@ -285,11 +363,11 @@ class _OnbordingState extends State<Onbording> {
             left: -10,
             top: MediaQuery.of(context).size.height * 0.4,
             child: IconButton(
-              icon: Icon(Icons.arrow_left, color: Colors.black, size: 50),
+              icon: const Icon(Icons.arrow_left, color: Colors.black, size: 50),
               onPressed: () {
                 if (currentIndex > 0) {
                   _controller.previousPage(
-                    duration: Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                   );
                 }
@@ -300,11 +378,12 @@ class _OnbordingState extends State<Onbording> {
             right: -10,
             top: MediaQuery.of(context).size.height * 0.4,
             child: IconButton(
-              icon: Icon(Icons.arrow_right, color: Colors.black, size: 50),
+              icon:
+                  const Icon(Icons.arrow_right, color: Colors.black, size: 50),
               onPressed: () {
                 if (currentIndex < contents.length - 1) {
                   _controller.nextPage(
-                    duration: Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                   );
                 }
@@ -318,7 +397,7 @@ class _OnbordingState extends State<Onbording> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 contents.length,
-                    (index) => buildDot(index, context),
+                (index) => buildDot(index, context),
               ),
             ),
           ),
@@ -331,10 +410,12 @@ class _OnbordingState extends State<Onbording> {
     return Container(
       height: 10,
       width: currentIndex == index ? 25 : 10,
-      margin: EdgeInsets.only(right: 5, bottom: 0),
+      margin: const EdgeInsets.only(right: 5, bottom: 0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: currentIndex == index ? Theme.of(context).primaryColor : Colors.grey,
+        color: currentIndex == index
+            ? Theme.of(context).primaryColor
+            : Colors.grey,
       ),
     );
   }

@@ -46,7 +46,8 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      appBar: AppBar(
+      ),
       body: Stack(
         children: [
           // Background image
@@ -74,7 +75,7 @@ class _HomescreenState extends State<Homescreen> {
                   : Container(
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(8.0),
                   border: Border.all(color: Colors.grey),
                 ),
@@ -102,12 +103,12 @@ class _HomescreenState extends State<Homescreen> {
                         },
                         child: Container(
                           color: Colors.blue,
-                          width: 30,
-                          height: 30,
+                          width: 10,
+                          height: 10,
                           child: Center(
                             child: Icon(
                               Icons.drag_handle,
-                              color: Colors.white,
+                              color: Colors.transparent,
                             ),
                           ),
                         ),

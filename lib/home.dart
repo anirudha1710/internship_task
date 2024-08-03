@@ -47,12 +47,21 @@ class _HomeState extends State<Home> {
       // Create a draggable text widget with initial position
       _draggableTexts.add(
         DraggableText(
+          id: DateTime.now().toString(), // Unique identifier for each text
           text: 'Draggable Text',
           position: Offset(100, 100), // Default position, can be changed
           onPositionChanged: (newPosition) {
             setState(() {
               // Update the position of the draggable text
-              _draggableTexts.firstWhere((element) => element.text == 'Draggable Text').position = newPosition;
+              final index = _draggableTexts.indexWhere((element) => element.id == newPosition.id);
+              if (index != -1) {
+                _draggableTexts[index] = DraggableText(
+                  id: newPosition.id,
+                  text: _draggableTexts[index].text,
+                  position: newPosition.position,
+                  onPositionChanged: (pos) {},
+                );
+              }
             });
           },
         ),
@@ -117,7 +126,7 @@ class _HomeState extends State<Home> {
       body: Stack(
         children: [
           // Image widget or Onbording widget goes here
-          Onbording(),
+          Onboarding(),
           ..._draggableTexts.map((draggableText) => Positioned(
             left: draggableText.position.dx,
             top: draggableText.position.dy,
@@ -145,7 +154,12 @@ class _HomeState extends State<Home> {
                 ),
               ),
               onDragEnd: (details) {
-                draggableText.onPositionChanged(details.offset);
+                draggableText.onPositionChanged(DraggableText(
+                  id: draggableText.id,
+                  text: draggableText.text,
+                  position: details.offset,
+                  onPositionChanged: (pos) {},
+                ));
               },
             ),
           )),
@@ -180,11 +194,13 @@ class _HomeState extends State<Home> {
 }
 
 class DraggableText {
+  String id; // Unique identifier
   String text;
   Offset position;
-  final void Function(Offset) onPositionChanged;
+  final void Function(DraggableText) onPositionChanged;
 
   DraggableText({
+    required this.id,
     required this.text,
     required this.position,
     required this.onPositionChanged,
