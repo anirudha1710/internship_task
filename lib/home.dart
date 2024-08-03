@@ -42,13 +42,14 @@ class _HomeState extends State<Home> {
     print('Forward button pressed');
   }
 
+
   void _addDraggableText() {
     setState(() {
       // Create a draggable text widget with initial position
       _draggableTexts.add(
         DraggableText(
           id: DateTime.now().toString(), // Unique identifier for each text
-          text: 'Draggable Text',
+          text: 'New Text',
           position: Offset(100, 100), // Default position, can be changed
           onPositionChanged: (newPosition) {
             setState(() {
@@ -132,11 +133,19 @@ class _HomeState extends State<Home> {
             top: draggableText.position.dy,
             child: Draggable(
               feedback: Material(
-                child: Text(
-                  draggableText.text,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
+                color: Colors.transparent,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.black,
+                    )
+                  ),
+                  child: Text(
+                    draggableText.text,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
                   ),
                 ),
               ),
@@ -180,6 +189,7 @@ class _HomeState extends State<Home> {
             label: 'Customize Pages',
           ),
         ],
+
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
         onTap: (index) {

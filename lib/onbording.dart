@@ -171,51 +171,50 @@ class _OnboardingState extends State<Onboarding> {
       context: context,
       isScrollControlled: true,
       builder: (BuildContext ctx) {
-        return StatefulBuilder(
-            builder: (context, sets) {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Font Size: ${contents[_selectedIndex].fontSize.toStringAsFixed(1)}',
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(height: 10),
-                    Slider(
-                      value: sliderval,
-                      min: 10.0,
-                      max: 100.0,
-                      divisions: 90,
-                      onChanged: (size) {
-                        sets(() {
-                          sliderval = size;
-                          contents[_selectedIndex].fontSize = size;
-                          _initTextSize = size;
-                        });
-                        setState(() {
-                          contents[_selectedIndex].fontSize = size;
-                        });
-
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      child: const Text('OK'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
+        return StatefulBuilder(builder: (context, sets) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Font Size: ${contents[_selectedIndex].fontSize.toStringAsFixed(1)}',
+                  style: const TextStyle(fontSize: 18),
                 ),
-              );
-            }
-        );
+                const SizedBox(height: 10),
+                Slider(
+                  value: sliderval,
+                  min: 10.0,
+                  max: 100.0,
+                  divisions: 90,
+                  onChanged: (size) {
+                    sets(() {
+                      sliderval = size;
+                      contents[_selectedIndex].fontSize = size;
+                      _initTextSize = size;
+                    });
+                    setState(() {
+                      contents[_selectedIndex].fontSize = size;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        });
       },
     );
   }
+
   double? _textSize;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -233,7 +232,7 @@ class _OnboardingState extends State<Onboarding> {
               return Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 38.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 38.0, vertical: 38.0),
                     child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
@@ -248,112 +247,115 @@ class _OnboardingState extends State<Onboarding> {
                     top: contents[i].dy,
                     child: _isEditing && _selectedIndex == i
                         ? Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.8,
-                      ),
-                      child: TextField(
-                        maxLines: null,
-                        onTapOutside: (event) {
-                          print('onTapOutside');
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          _updateText();
-                        },
-                        controller: _textController,
-                        autofocus: false,
-                        onSubmitted: (_) => _updateText(),
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.zero,
-                          fillColor: Colors.transparent,
-                          filled: true,
-                        ),
-                        style: TextStyle(
-                          fontSize: contents[i].fontSize,
-                          color: contents[i].color,
-                          fontFamily: contents[i].fontFamily,
-                        ),
-                      ),
-                    )
-                        : GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedIndex = i;
-                        });
-                        _showOptionsBottomSheet();
-                      },
-                      onScaleUpdate: (details) {
-                        setState(() {
-                          _textSize =
-                              _initTextSize + (_initTextSize * (details.scale * .35));
-                          contents[i].fontSize = _textSize!;
-                        });
-                      },
-                      onScaleEnd: (ScaleEndDetails details) {
-                        setState(() {
-                          contents[i].fontSize = _textSize!;
-                        });
-                      },
-                      child: Draggable(
-                        feedback: Material(
-                          color: Colors.transparent,
-                          child: Container(
-                            padding: EdgeInsets.all(5),
-
-                            width: MediaQuery.of(context).size.width -
-                                38 * 2,
-                            child: Text(
-                              contents[i].texts.join('\n'),
-                              softWrap: true,
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.8,
+                            ),
+                            child: TextField(
+                              maxLines: null,
+                              onTapOutside: (event) {
+                                print('onTapOutside');
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                _updateText();
+                              },
+                              controller: _textController,
+                              autofocus: false,
+                              onSubmitted: (_) => _updateText(),
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.zero,
+                                fillColor: Colors.transparent,
+                                filled: true,
+                              ),
                               style: TextStyle(
                                 fontSize: contents[i].fontSize,
                                 color: contents[i].color,
-
                                 fontFamily: contents[i].fontFamily,
                               ),
-                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedIndex = i;
+                              });
+                              _showOptionsBottomSheet();
+                            },
+                            onScaleUpdate: (details) {
+                              setState(() {
+                                _textSize = _initTextSize +
+                                    (_initTextSize * (details.scale * .35));
+                                contents[i].fontSize = _textSize!;
+                              });
+                            },
+                            onScaleEnd: (ScaleEndDetails details) {
+                              setState(() {
+                                contents[i].fontSize = _textSize!;
+                              });
+                            },
+                            child: Draggable(
+                              feedback: Material(
+                                color: Colors.transparent,
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  width: MediaQuery.of(context).size.width -
+                                      38 * 2,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.black,
+                                      )
+                                    ),
+                                    child: Text(
+                                      contents[i].texts.join('\n'),
+                                      softWrap: true,
+                                      style: TextStyle(
+                                        fontSize: contents[i].fontSize,
+                                        color: contents[i].color,
+                                        fontFamily: contents[i].fontFamily,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              childWhenDragging: Container(),
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(),
+                                width:
+                                    MediaQuery.of(context).size.width - 38 * 2,
+                                child: Text(
+                                  contents[i].texts.join('\n'),
+                                  softWrap: true,
+                                  style: TextStyle(
+                                    fontSize: contents[i].fontSize,
+                                    color: contents[i].color,
+                                    fontFamily: contents[i].fontFamily,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              onDragEnd: (details) {
+                                setState(() {
+                                  contents[i].dx = details.offset.dx;
+                                  contents[i].dy = details.offset.dy - 80;
+                                  if (contents[i].dx < 38) {
+                                    contents[i].dx = 38;
+                                  }
+                                  if (contents[i].dx >
+                                      MediaQuery.of(context).size.width - 38) {
+                                    contents[i].dx =
+                                        MediaQuery.of(context).size.width - 38;
+                                  }
+                                });
+                              },
+                              onDragUpdate: (details) {
+                                setState(() {
+                                  contents[i].dx = details.delta.dx;
+                                  contents[i].dy = details.delta.dy;
+                                });
+                              },
                             ),
                           ),
-                        ),
-                        childWhenDragging: Container(),
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-
-                          ),
-                          width:
-                          MediaQuery.of(context).size.width - 38 * 2,
-                          child: Text(
-                            contents[i].texts.join('\n'),
-                            softWrap: true,
-                            style: TextStyle(
-                              fontSize: contents[i].fontSize,
-                              color: contents[i].color,
-                              fontFamily: contents[i].fontFamily,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        onDragEnd: (details) {
-                          setState(() {
-                            contents[i].dx = details.offset.dx;
-                            contents[i].dy = details.offset.dy - 80;
-                            if (contents[i].dx < 38) {
-                              contents[i].dx = 38;
-                            }
-                            if (contents[i].dx >
-                                MediaQuery.of(context).size.width - 38) {
-                              contents[i].dx =
-                                  MediaQuery.of(context).size.width - 38;
-                            }
-                          });
-                        },
-                        onDragUpdate: (details) {
-                          setState(() {
-                            contents[i].dx = details.delta.dx;
-                            contents[i].dy = details.delta.dy;
-                          });
-                        },
-                      ),
-                    ),
                   ),
                 ],
               );
@@ -379,7 +381,7 @@ class _OnboardingState extends State<Onboarding> {
             top: MediaQuery.of(context).size.height * 0.4,
             child: IconButton(
               icon:
-              const Icon(Icons.arrow_right, color: Colors.black, size: 50),
+                  const Icon(Icons.arrow_right, color: Colors.black, size: 50),
               onPressed: () {
                 if (currentIndex < contents.length - 1) {
                   _controller.nextPage(
@@ -397,7 +399,7 @@ class _OnboardingState extends State<Onboarding> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 contents.length,
-                    (index) => buildDot(index, context),
+                (index) => buildDot(index, context),
               ),
             ),
           ),
