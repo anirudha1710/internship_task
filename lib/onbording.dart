@@ -224,6 +224,7 @@ class _OnboardingState extends State<Onboarding> {
     );
   }
 
+
   double? _textSize;
 
   @override
