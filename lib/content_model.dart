@@ -22,18 +22,18 @@ class UnbordingContent {
 
 List<UnbordingContent> contents = [
   UnbordingContent(
-    texts: ['We are inviting you and your family\'s gracious presence and blessing.'],
+    texts: ['We are inviting you.'],
     image: 'asset/bg.png',
   ),
   UnbordingContent(
-    texts: [''],
+    texts: [],
     image: 'asset/bg.png',
   ),
   UnbordingContent(
     texts: [
-      'Most of us have childhood memories of gaping at our elders in wonder when they narrated to us the amusing fables of Aesop, the picturesque fairy tales, the funny anecdotes, the lyrical short stories, and so on.','Most of us have childhood memories of gaping at our elders in wonder when they narrated to us the amusing fables of Aesop, the picturesque fairy tales, the funny anecdotes, the lyrical short stories, and so on.',
+      'Most of us.',
       ' '
-          'the picturesque fairy tales, the funny anecdotes, the lyrical short stories, and so on.',
+          'the picturesque fairy tales.',
     ],
     image: 'asset/bg.png',
   ),

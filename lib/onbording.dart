@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'content_model.dart'; // Import your content model
@@ -16,6 +17,11 @@ class _OnboardingState extends State<Onboarding> {
   final TextEditingController _textController = TextEditingController();
   late PageController _controller;
   double _initTextSize = 16.0;
+  double _scaleFactor = 1.0; // Track the scale factor
+
+  late bool isTapped = false;
+  int _currentPage = 0;
+
 
   final List<String> _fonts = [
     'Roboto', 'Dancing Script', 'Lobster Two',
@@ -25,6 +31,11 @@ class _OnboardingState extends State<Onboarding> {
   @override
   void initState() {
     _controller = PageController(initialPage: 0);
+    _controller.addListener(() {
+      setState(() {
+        _currentPage = _controller.page!.round();
+      });
+    });
     super.initState();
   }
 
@@ -229,10 +240,12 @@ class _OnboardingState extends State<Onboarding> {
               });
             },
             itemBuilder: (_, i) {
+              bool isPageTwo = i == 2;
               return Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 38.0, vertical: 38.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 38.0, vertical: 38.0),
                     child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
@@ -272,89 +285,137 @@ class _OnboardingState extends State<Onboarding> {
                               ),
                             ),
                           )
-                        : GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedIndex = i;
-                              });
-                              _showOptionsBottomSheet();
-                            },
-                            onScaleUpdate: (details) {
-                              setState(() {
-                                _textSize = _initTextSize +
-                                    (_initTextSize * (details.scale * .35));
-                                contents[i].fontSize = _textSize!;
-                              });
-                            },
-                            onScaleEnd: (ScaleEndDetails details) {
-                              setState(() {
-                                contents[i].fontSize = _textSize!;
-                              });
-                            },
-                            child: Draggable(
-                              feedback: Material(
-                                color: Colors.transparent,
-                                child: Container(
-                                  padding: EdgeInsets.all(5),
-                                  width: MediaQuery.of(context).size.width -
-                                      38 * 2,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.black,
-                                      )
-                                    ),
-                                    child: Text(
-                                      contents[i].texts.join('\n'),
-                                      softWrap: true,
-                                      style: TextStyle(
-                                        fontSize: contents[i].fontSize,
-                                        color: contents[i].color,
-                                        fontFamily: contents[i].fontFamily,
+                        : Stack(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedIndex = i;
+                                  });
+                                  _showOptionsBottomSheet();
+                                },
+                                onScaleUpdate: (details) {
+                                  setState(() {
+                                    _textSize = _initTextSize +
+                                        (_initTextSize * (details.scale * .35));
+                                    contents[i].fontSize = _textSize!;
+                                  });
+                                },
+                                onScaleEnd: (ScaleEndDetails details) {
+                                  setState(() {
+                                    contents[i].fontSize = _textSize!;
+                                  });
+                                },
+                                child: Draggable(
+                                  feedback: Material(
+                                    color: Colors.transparent,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(5),
+                                      width: MediaQuery.of(context).size.width -
+                                          38 * 2,
+                                      child: Container(
+                                        // color: Colors.yellow,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                          color: Colors.black,
+                                        )),
+                                        padding: const EdgeInsets.all(5),
+                                        child: Text(
+                                          contents[i].texts.join('\n'),
+                                          softWrap: true,
+                                          style: TextStyle(
+                                            fontSize: contents[i].fontSize,
+                                            color: contents[i].color,
+                                            fontFamily:
+                                                contents[i].fontFamily,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                      textAlign: TextAlign.center,
                                     ),
                                   ),
-                                ),
-                              ),
-                              childWhenDragging: Container(),
-                              child: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(),
-                                width:
-                                    MediaQuery.of(context).size.width - 38 * 2,
-                                child: Text(
-                                  contents[i].texts.join('\n'),
-                                  softWrap: true,
-                                  style: TextStyle(
-                                    fontSize: contents[i].fontSize,
-                                    color: contents[i].color,
-                                    fontFamily: contents[i].fontFamily,
+                                  childWhenDragging: Container(),
+                                  child: DottedBorder(
+                                    padding: EdgeInsets.all(0.8),
+                                    color: Colors.transparent, // Border color
+                                    strokeWidth: 2, // Border width
+                                    dashPattern: [
+                                      4,
+                                      2
+                                    ], // Pattern of dashes and gaps
+                                    borderType: BorderType.RRect,
+                                    child: SizedBox(
+                                      width: isPageTwo
+                                          ? null
+                                          : MediaQuery.of(context).size.width - 40 * 2,
+                                      child: Text(
+                                        contents[i].texts.join('\n'),
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontSize: contents[i].fontSize,
+                                          color: contents[i].color,
+                                          fontFamily: contents[i].fontFamily,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
                                   ),
-                                  textAlign: TextAlign.center,
+                                  onDragEnd: (details) {
+                                    setState(() {
+                                      contents[i].dx = details.offset.dx;
+                                      contents[i].dy = details.offset.dy - 80;
+
+                                      if (contents[i].dx < 38) {
+                                        contents[i].dx = 38;
+                                      }
+                                      if (contents[i].dx > MediaQuery.of(context).size.width - 38) {
+                                        contents[i].dx = MediaQuery.of(context).size.width - 38;
+                                      }
+                                      if (contents[i].dy < 38) {
+                                        contents[i].dy = 38;
+                                      }
+                                      if (contents[i].dy > MediaQuery.of(context).size.height - 38) {
+                                        contents[i].dy = MediaQuery.of(context).size.height - 38;
+                                      }
+                                    });
+                                  },
+                                  onDragUpdate: (details) {
+                                    setState(() {
+                                      contents[i].dx = details.delta.dx;
+                                      contents[i].dy = details.delta.dy;
+                                      contents[i].dy = details.delta.dy;
+                                    });
+                                  },
                                 ),
                               ),
-                              onDragEnd: (details) {
-                                setState(() {
-                                  contents[i].dx = details.offset.dx;
-                                  contents[i].dy = details.offset.dy - 80;
-                                  if (contents[i].dx < 38) {
-                                    contents[i].dx = 38;
-                                  }
-                                  if (contents[i].dx >
-                                      MediaQuery.of(context).size.width - 38) {
-                                    contents[i].dx =
-                                        MediaQuery.of(context).size.width - 38;
-                                  }
-                                });
-                              },
-                              onDragUpdate: (details) {
-                                setState(() {
-                                  contents[i].dx = details.delta.dx;
-                                  contents[i].dy = details.delta.dy;
-                                });
-                              },
-                            ),
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: GestureDetector(
+                                  onPanUpdate: (details) {
+                                    setState(() {
+                                      _scaleFactor += details.delta.dy * 0.01;
+                                      _scaleFactor =
+                                          _scaleFactor.clamp(0.5, 6.0);
+                                      contents[i].fontSize =
+                                          _initTextSize * _scaleFactor;
+                                    });
+                                  },
+                                  onPanEnd: (details) {
+                                    _initTextSize = contents[i].fontSize;
+                                  },
+                                  onTap: () {
+                                    isTapped = !isTapped;
+                                  },
+                                  child: Icon(
+                                    Icons.add,
+                                    color: isTapped ? Colors.white : Colors.transparent,
+                                    //color: Colors.white ,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                   ),
                 ],
